@@ -1,3 +1,5 @@
+import { DataView } from 'vis-data/peer';
+
 export interface Node {
   id: string;
   label: string;
@@ -10,10 +12,13 @@ export interface Node {
 }
 
 export interface Edge {
+  id?: string;
   from: string;
   to: string;
   label: string;
   color?: { color: string };
+  // FIX: Added optional 'dashes' property to support dashed lines for edges.
+  dashes?: boolean;
 }
 
 export interface GraphData {
@@ -34,3 +39,4 @@ export interface ChatMessage {
 }
 
 export type LayoutType = 'physics' | 'hierarchical';
+export type GraphDataView = DataView<Node, any>;

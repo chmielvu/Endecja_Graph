@@ -425,7 +425,7 @@ export const GRAPH_DATA: GraphData = {
         { from: 'ruch_narodowy', to: 'mw', label: 'DREW_FROM' },
 
         // --- Political Links (Allies/Rivals) ---
-        { from: 'dmowski', to: 'pilsudski', label: 'POLITICAL_RIVAL', color: { color: '#ef4444' } },
+        { from: 'dmowski', to: 'pilsudski', label: 'POLITICAL_RIVAL', color: { color: '#ef4444' }, dashes: true },
         { from: 'dmowski', to: 'versailles', label: 'DELEGATE_AT' },
         { from: 'paderewski', to: 'versailles', label: 'DELEGATE_AT' },
         { from: 'dmowski', to: 'paderewski', label: 'ALLIED_AT_VERSAILLES' },
@@ -436,10 +436,10 @@ export const GRAPH_DATA: GraphData = {
 
         // --- Sanacja & Repression Links ---
         { from: 'pilsudski', to: 'sanacja', label: 'LEADER_OF' },
-        { from: 'sanacja', to: 'dmowski', label: 'POLITICAL_RIVAL', color: { color: '#ef4444' } },
-        { from: 'sanacja', to: 'owp', label: 'DELEGALIZED', color: { color: '#ef4444' } },
-        { from: 'sanacja', to: 'sn', label: 'REPRESSED', color: { color: '#ef4444' } },
-        { from: 'sanacja', to: 'onr', label: 'DELEGALIZED', color: { color: '#ef4444' } }, 
+        { from: 'sanacja', to: 'dmowski', label: 'POLITICAL_RIVAL', color: { color: '#ef4444' }, dashes: true },
+        { from: 'sanacja', to: 'owp', label: 'DELEGALIZED', color: { color: '#ef4444' }, dashes: true },
+        { from: 'sanacja', to: 'sn', label: 'REPRESSED', color: { color: '#ef4444' }, dashes: true },
+        { from: 'sanacja', to: 'onr', label: 'DELEGALIZED', color: { color: '#ef4444' }, dashes: true }, 
         { from: 'sanacja', to: 'bereza_kartuska', label: 'OPERATED' },
         { from: 'sn', to: 'bereza_kartuska', label: 'MEMBERS_IMPRISONED' },
         { from: 'owp', to: 'bereza_kartuska', label: 'MEMBERS_IMPRISONED' },
