@@ -6,7 +6,7 @@ const FilterButton: React.FC<{ filter: string, activeFilter: string, onClick: (f
     return (
         <button
             onClick={() => onClick(filter)}
-            className={`px-3 py-1.5 text-xs md:text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-150 ${isActive ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500' : 'bg-white text-gray-700 hover:bg-gray-50 focus:ring-indigo-500 border border-gray-300'}`}
+            className={`px-3 py-1.5 text-xs md:text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-150 ${isActive ? 'bg-indigo-700 text-white hover:bg-indigo-800 focus:ring-indigo-500' : 'bg-white text-gray-700 hover:bg-stone-100 focus:ring-indigo-500 border border-stone-300'}`}
         >
             {children}
         </button>
@@ -14,7 +14,7 @@ const FilterButton: React.FC<{ filter: string, activeFilter: string, onClick: (f
 };
 
 const GraphControls: React.FC = () => {
-    const { layout, setLayout, activeFilter, setFilter } = useGraphStore();
+    const { layout, setLayout, activeFilter, setFilter, clusterMode, toggleClusterMode } = useGraphStore();
 
     const toggleLayout = () => {
         setLayout(layout === 'physics' ? 'hierarchical' : 'physics');
@@ -45,7 +45,13 @@ const GraphControls: React.FC = () => {
                         onClick={toggleLayout} 
                         className="px-3 py-2 text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-150 bg-green-600 text-white hover:bg-green-700 focus:ring-green-500"
                     >
-                        {layout === 'physics' ? 'Switch to Hierarchical Layout' : 'Switch to Physics Layout'}
+                        {layout === 'physics' ? 'Switch to Temporal Layout' : 'Switch to Physics Layout'}
+                    </button>
+                    <button 
+                        onClick={toggleClusterMode} 
+                        className="ml-4 px-3 py-2 text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-150 bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500"
+                    >
+                        {clusterMode ? 'Uncluster Nodes' : 'Cluster by Group'}
                     </button>
                 </div>
             </div>

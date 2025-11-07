@@ -146,22 +146,35 @@ RULES:
   }
 };
 
-// --- SOTA: Multimodal Analysis Service ---
-export const analyzeImage = async (imageUrl: string): Promise<string> => {
+// --- SOTA: Multimodal Analysis Service (Handles BOTH URLs and Base64) ---
+export const analyzeImage = async (imageString: string): Promise<string> => {
     try {
-        const response = await fetch(imageUrl);
-        if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
-        const blob = await response.blob();
-        const reader = new FileReader();
-        const base64Data = await new Promise<string>((resolve, reject) => {
-            reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
+        let base64Data: string;
+        let mimeType: string;
+
+        if (imageString.startsWith('data:')) {
+            // It's a Base64 string
+            const parts = imageString.split(',');
+            const meta = parts[0].split(';')[0].split(':')[1];
+            mimeType = meta;
+            base64Data = parts[1];
+        } else {
+            // It's a URL, fetch and convert it
+            const response = await fetch(imageString);
+            if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
+            const blob = await response.blob();
+            mimeType = blob.type;
+            base64Data = await new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
 
         const imagePart: Part = {
             inlineData: {
-                mimeType: blob.type,
+                mimeType: mimeType,
                 data: base64Data,
             },
         };

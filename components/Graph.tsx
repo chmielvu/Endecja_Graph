@@ -5,7 +5,7 @@ import { Node, Edge, GraphDataView } from '../types';
 import { useGraphStore } from '../services/useGraphStore';
 
 const Graph: React.FC = () => {
-  const { allNodes, allEdges, layout, activeFilter, setSelectedNodeId } = useGraphStore();
+  const { allNodes, allEdges, layout, activeFilter, setSelectedNodeId, clusterMode, nodePositions, setNodePositions } = useGraphStore();
   
   const containerRef = useRef<HTMLDivElement>(null);
   const networkRef = useRef<Network | null>(null);
@@ -108,10 +108,17 @@ const Graph: React.FC = () => {
   };
 
   const hierarchicalLayoutOptions = {
-      edges: { ...baseOptions.edges, smooth: { type: 'cubicBezier', forceDirection: 'horizontal', roundness: 0.4 }, font: {align: 'middle'} },
+      edges: { ...baseOptions.edges, smooth: { type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.4 }, font: {align: 'middle'} },
       physics: { enabled: false },
       layout: {
-          hierarchical: { enabled: true, direction: 'LR', sortMethod: 'directed', levelSeparation: 300, nodeSpacing: 150 }
+          hierarchical: { 
+              enabled: true, 
+              direction: 'UD', // SOTA CHANGE: Up-Down layout
+              sortMethod: 'directed', // This uses the 'level' property we just defined
+              levelSeparation: 250, // More vertical space between eras
+              nodeSpacing: 160,     // Space between nodes in the same era
+              treeSpacing: 200      // Space between different trees
+          }
       }
   };
   
@@ -150,6 +157,20 @@ const Graph: React.FC = () => {
      });
      nodesRef.current.update(nodesToUpdate);
    };
+
+    const clusterByGroup = () => {
+        if (!networkRef.current) return;
+        networkRef.current.cluster({
+            joinCondition: (nodeOptions) => nodeOptions.group === activeFilter,
+            clusterNodeProperties: {
+                id: `cluster:${activeFilter}`,
+                label: `${activeFilter.toUpperCase()}S`,
+                group: activeFilter,
+                shape: 'ellipse',
+                allowSingleNodeCluster: true,
+            },
+        });
+    };
 
   // SOTA FIX: Initialize network instance ONCE on mount
   useEffect(() => {
@@ -199,7 +220,15 @@ const Graph: React.FC = () => {
   // SOTA FIX: This effect updates the *master* data when the store changes
   useEffect(() => {
     // Add titles for tooltips
-    const nodesWithTitles = allNodes.map(n => ({...n, title: n.description || n.label}));
+    const nodesWithTitles = allNodes.map(n => {
+        const position = nodePositions[n.id];
+        return {
+          ...n,
+          title: n.description || n.label,
+          x: position?.x, // Load X position
+          y: position?.y, // Load Y position
+        };
+    });
     
     nodesRef.current.clear();
     nodesRef.current.add(nodesWithTitles);
@@ -221,18 +250,45 @@ const Graph: React.FC = () => {
     if (edgeViewRef.current) {
       edgeViewRef.current.refresh();
     }
+    // If we are in cluster mode, re-cluster when filter changes
+    if (clusterMode) {
+        clusterByGroup();
+    }
   }, [activeFilter]);
 
   // SOTA FIX: This effect handles layout changes
   useEffect(() => {
     if (networkRef.current) {
-      const optionsToApply = layout === 'physics' ? physicsLayoutOptions : hierarchicalLayoutOptions;
-      networkRef.current.setOptions(optionsToApply);
-      if(layout === 'physics') {
-        networkRef.current.stabilize(1500);
-      }
+        // If positions are already stored, don't use physics
+        const usePhysics = Object.keys(nodePositions).length === 0;
+
+        const optionsToApply = layout === 'physics' ? 
+            { ...physicsLayoutOptions, physics: { enabled: usePhysics } } : 
+            hierarchicalLayoutOptions;
+
+        networkRef.current.setOptions(optionsToApply);
+
+        if (usePhysics && layout === 'physics') {
+            // After stabilizing, store positions
+            networkRef.current.once("stabilizationIterationsDone", () => {
+                networkRef.current.storePositions();
+                const positions = networkRef.current.getPositions();
+                setNodePositions(positions);
+                // Turn physics off now that we are stable
+                networkRef.current.setOptions({ physics: false });
+            });
+        }
     }
-  }, [layout]);
+  }, [layout, nodePositions, setNodePositions]);
+
+  // SOTA FIX: Add a new effect just for clustering
+    useEffect(() => {
+        if (clusterMode && activeFilter !== 'all') {
+            clusterByGroup();
+        } else {
+            networkRef.current?.setData({ nodes: nodeViewRef.current, edges: edgeViewRef.current }); // Resets all clusters
+        }
+    }, [clusterMode]);
 
   return <div ref={containerRef} className="h-full w-full bg-[#FBF9F4] border border-stone-300 rounded-lg" />;
 };

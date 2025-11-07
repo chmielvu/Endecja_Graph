@@ -16,6 +16,8 @@ interface GraphState {
   selectedNodeId: string | null;
   layout: LayoutType;
   activeFilter: string;
+  clusterMode: boolean;
+  nodePositions: { [key: string]: { x: number, y: number } };
   
   // Actions
   initializeGraph: (nodes: Node[], edges: Edge[]) => void;
@@ -24,6 +26,8 @@ interface GraphState {
   setFilter: (filter: string) => void;
   addNode: (node: Node) => void;
   addEdges: (edges: Edge[]) => void;
+  toggleClusterMode: () => void;
+  setNodePositions: (positions: { [key: string]: { x: number, y: number } }) => void;
 
   // Computed (getters)
   getSelectedNode: () => Node | null;
@@ -39,6 +43,8 @@ export const useGraphStore = create<GraphState>()(
       selectedNodeId: null,
       layout: 'physics',
       activeFilter: 'all',
+      clusterMode: false,
+      nodePositions: {},
 
       // Actions
       initializeGraph: (nodes, edges) => set({ allNodes: nodes, allEdges: ensureEdgeIds(edges) }),
@@ -62,6 +68,8 @@ export const useGraphStore = create<GraphState>()(
           set(state => ({ allEdges: [...state.allEdges, ...uniqueNewEdges] }));
         }
       },
+      toggleClusterMode: () => set(state => ({ clusterMode: !state.clusterMode })),
+      setNodePositions: (positions) => set({ nodePositions: positions }),
       
       // Getters for computed state
       getSelectedNode: () => {

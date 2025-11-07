@@ -50,7 +50,7 @@ const ContextPanel: React.FC = () => {
           alt={selectedNode.label} 
           className="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 shadow-md"
           style={{ borderColor }}
-          onError={(e) => { (e.target as HTMLImageElement).src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/800px-No-Image-Placeholder.svg.png'; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iODAwIj48cGF0aCBkPSJNMCAwIDgwMCA4MDB6IiBmaWxsPSIjZWNlY2VjIi8+PHRleHQgZmlsbD0iI2FhYSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNzIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQwMCIgeT0iNDA5Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4='; }}
         />
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-1">{selectedNode.label}</h2>
         <p className="text-sm text-gray-500 text-center uppercase font-semibold mb-6" style={{ color: borderColor }}>{selectedNode.group}</p>
