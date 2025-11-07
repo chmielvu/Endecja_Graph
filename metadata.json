@@ -1,0 +1,5 @@
+{
+  "name": "The Prompting Bible: Interactive Knowledge Graph",
+  "description": "An interactive knowledge graph explorer for the Polish National Democracy (Endecja) movement, featuring an AI-powered tutor built with the Gemini API to analyze content, answer questions with search grounding, and provide deep analysis.",
+  "requestFramePermissions": []
+}
