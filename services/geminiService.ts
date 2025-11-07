@@ -121,16 +121,15 @@ export const runChat = async (history: ChatMessage[], message: string, mode: Cha
 export const proposeNewGraphData = async (topic: string, existingNodeIds: string[]): Promise<string> => {
   const systemInstruction = `You are a historical data formatting agent. You return *ONLY* a valid JSON object matching this structure:
 {
-  "newNode": { "id": "string", "label": "string", "group": "string", "description": "string", "image": "URL_string", "level": number, "start": "YYYY-MM-DD", "end": "YYYY-MM-DD" },
+  "newNode": { "id": "string", "label": "string", "group": "string", "description": "string", "level": number, "start": "YYYY-MM-DD", "end": "YYYY-MM-DD" },
   "newEdges": [ { "from": "new_node_id", "to": "existing_node_id", "label": "string" } ]
 }
 RULES:
 1. "newNode.id" *MUST* be new, unique, lowercase. It *CANNOT* be any of these: ${existingNodeIds.join(', ')}
-2. "newNode.image" *MUST* be a real, direct image URL.
-3. "newEdges[].from" *MUST* match "newNode.id".
-4. "newEdges[].to" *MUST* be one of the existing node IDs provided.
-5. "start" and "end" dates are optional but preferred.
-6. Do not include any text, markdown, or apologies before or after the JSON object.`;
+2. "newEdges[].from" *MUST* match "newNode.id".
+3. "newEdges[].to" *MUST* be one of the existing node IDs provided.
+4. "start" and "end" dates are optional but preferred.
+5. Do not include any text, markdown, or apologies before or after the JSON object.`;
 
   const contents = [{ role: 'user', parts: [{ text: `Research "${topic}" and its relationship to the Polish Endecja movement. Generate the JSON object.` }] }];
 
@@ -188,7 +187,7 @@ The JSON object *MUST* match this exact structure:
 {
   "proposals": [
     {
-      "newNode": { "id": "string", "label": "string", "group": "string", "description": "string", "image": "URL_string", "level": number, "start": "YYYY-MM-DD", "end": "YYYY-MM-DD" },
+      "newNode": { "id": "string", "label": "string", "group": "string", "description": "string", "level": number, "start": "YYYY-MM-DD", "end": "YYYY-MM-DD" },
       "newEdges": [ { "from": "new_node_id", "to": "existing_node_id", "label": "string" } ]
     }
   ]
@@ -198,9 +197,8 @@ RULES:
 2.  The "newNode.id" for each proposal *MUST* be a new, unique, lowercase string. It *CANNOT* be any of these existing IDs: ${existingNodeIds.join(', ')}
 3.  The "newNode.description" must be a concise summary derived *from the document*.
 4.  The "newEdges[].to" *MUST* be one of the existing node IDs provided.
-5.  Do research to find a valid direct image URL for each "newNode.image".
-6.  If no new entities are found, return { "proposals": [] }.
-7.  Do not include any text, markdown, or apologies before or after the JSON object.`;
+5.  If no new entities are found, return { "proposals": [] }.
+6.  Do not include any text, markdown, or apologies before or after the JSON object.`;
 
     const contents = [
         { role: 'user', parts: [{ text: "Here is the document. Please process it and generate the KGOT JSON object." }, {text: fileContent}] }

@@ -52,7 +52,7 @@ const DocumentImporter: React.FC = () => {
     };
 
     return (
-        <div className="p-4 bg-white rounded-lg shadow-md">
+        <div className="p-4 bg-stone-50 rounded-lg shadow-lg">
             <h3 className="text-lg font-bold text-gray-800 mb-2">Document Importer (KGOT)</h3>
             <p className="text-xs text-gray-500 mb-3">Drop a .txt file (e.g., a biography) to auto-extract new entities.</p>
             

@@ -35,7 +35,7 @@ const GraphControls: React.FC = () => {
     ];
 
     return (
-        <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
+        <div className="bg-stone-50 p-4 rounded-lg shadow-lg mb-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     {/* Placeholder for future search bar */}

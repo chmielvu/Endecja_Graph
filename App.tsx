@@ -20,17 +20,27 @@ const App: React.FC = () => {
   }, [allNodes.length, initializeGraph]);
 
   return (
-    <div className="h-screen w-screen p-4 sm:p-6 lg:p-8 flex flex-col bg-amber-50">
-      <header className="mb-4 flex-shrink-0">
+    <div className="h-screen w-screen p-4 sm:p-6 lg:p-8 flex flex-col relative">
+      <div 
+          className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none" 
+          style={{
+            backgroundImage: "url('https://upload.wikimedia.org/wikipedia/commons/d/d8/Jozef_Pilsudski_and_Roman_Dmowski_in_Paris_1919.jpg'), url('https://upload.wikimedia.org/wikipedia/commons/2/2b/Traktat_wersalski_-_j%C4%99zyk_polski.jpg')",
+            backgroundPosition: 'right 20% top 10%, left 20% bottom 10%',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: '800px, 600px',
+            filter: 'grayscale(100%)'
+          }}
+        ></div>
+      <header className="mb-4 flex-shrink-0 z-10">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Polish National Democracy (Endecja)</h1>
         <p className="text-md text-gray-600">The Living Archive: An interactive knowledge graph powered by the Gemini 2.5 Suite.</p>
       </header>
 
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 z-10">
         <GraphControls />
       </div>
       
-      <main className="flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
+      <main className="flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0 z-10">
         {/* Left Column: Graph and Timeline */}
         <div className="lg:col-span-2 h-full flex flex-col gap-4">
           <div className="flex-grow-[3] min-h-0">
@@ -43,7 +53,7 @@ const App: React.FC = () => {
 
         {/* Right Column: Context and AI Tools */}
         <div className="h-full flex flex-col gap-6 overflow-y-auto">
-            <div className="flex-shrink-0 bg-white rounded-lg shadow-md">
+            <div className="flex-shrink-0 bg-stone-50 rounded-lg shadow-lg">
                  <ContextPanel />
             </div>
             <div className="flex-shrink-0">

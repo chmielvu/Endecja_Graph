@@ -56,7 +56,7 @@ const AiTutor: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg shadow-md">
+    <div className="flex flex-col h-full bg-stone-50 rounded-lg shadow-lg">
       <div className="p-4 border-b">
         <h2 className="text-xl font-bold text-gray-800">AI Tutor</h2>
         <div className="flex gap-2 mt-3">

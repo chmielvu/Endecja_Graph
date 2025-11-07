@@ -31,10 +31,15 @@ const ContextPanel: React.FC = () => {
   }
   
   const groupColors: { [key: string]: string } = {
-      ideologue: '#2563EB', thinker: '#2563EB', modern_nd: '#0d9488',
-      leader: '#16a34a', antagonist: '#4B5563', organization: '#DC2626',
-      event: '#D97706', publication: '#D97706', clergy: '#FBBF24',
-      city: '#4b5563',
+      ideologue: '#3730a3', thinker: '#3730a3', // Deep Blue
+      modern_nd: '#4b5563', // Muted Gray
+      leader: '#14532d', // Forest Green
+      antagonist: '#171717', // Charcoal
+      organization: '#9f1239', // Claret Red
+      event: '#9a3412', // Archival Orange
+      publication: '#9a3412', // Archival Orange
+      clergy: '#b45309', // Gold
+      city: '#57534e', // Stone
   }
   const borderColor = groupColors[selectedNode.group] || '#d1d5db';
 
@@ -45,7 +50,7 @@ const ContextPanel: React.FC = () => {
           alt={selectedNode.label} 
           className="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 shadow-md"
           style={{ borderColor }}
-          onError={(e) => { (e.target as HTMLImageElement).src = 'https://i.ibb.co/g7pMXX5/image-missing.png'; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/800px-No-Image-Placeholder.svg.png'; }}
         />
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-1">{selectedNode.label}</h2>
         <p className="text-sm text-gray-500 text-center uppercase font-semibold mb-6" style={{ color: borderColor }}>{selectedNode.group}</p>
@@ -78,7 +83,7 @@ const ContextPanel: React.FC = () => {
             {analysis && (
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Multimodal Analysis</h3>
-                <p className="text-gray-700 leading-relaxed text-sm bg-gray-100 p-3 rounded-md" dangerouslySetInnerHTML={{ __html: analysis.replace(/\n/g, '<br />') }} />
+                <p className="text-gray-700 leading-relaxed text-sm bg-stone-200 p-3 rounded-md" dangerouslySetInnerHTML={{ __html: analysis.replace(/\n/g, '<br />') }} />
               </div>
             )}
 
