@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Node } from '../types';
 
@@ -16,14 +15,18 @@ const ContextPanel: React.FC<ContextPanelProps> = ({ node }) => {
     );
   }
   
+  // Thematic Color Palette: Patriotic, Catholic, Academic
   const groupColors: { [key: string]: string } = {
-    ideologue: '#be185d',
-    thinker: '#1d4ed8',
-    modern_nd: '#0d9488',
-    leader: '#16a34a',
-    publication: '#ca8a04',
-    organization: '#d97706',
-    city: '#4b5563',
+      ideologue: '#2563EB', // Marian Blue
+      thinker: '#2563EB', // Marian Blue
+      modern_nd: '#0d9488', // Teal
+      leader: '#16a34a', // Green
+      antagonist: '#4B5563', // Stark Gray
+      organization: '#DC2626', // National Red
+      event: '#D97706', // Papal Gold
+      publication: '#D97706', // Papal Gold
+      clergy: '#FBBF24', // Papal Gold variant
+      city: '#4b5563',
   }
 
   const borderColor = groupColors[node.group] || '#d1d5db';
@@ -35,13 +38,20 @@ const ContextPanel: React.FC<ContextPanelProps> = ({ node }) => {
           alt={node.label} 
           className="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 shadow-md"
           style={{ borderColor }}
-          onError={(e) => { (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/error/100/100'; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/100/e2e8f0/718096?text=Image+Missing'; }}
         />
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-1">{node.label}</h2>
         <p className="text-sm text-gray-500 text-center uppercase font-semibold mb-6" style={{ color: borderColor }}>{node.group}</p>
         
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Description</h3>
         <p className="text-gray-700 leading-relaxed">{node.description}</p>
+
+        {node.link && (
+             <a href={node.link} target="_blank" rel="noopener noreferrer" 
+                className="mt-4 inline-block w-full text-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                 Learn More
+             </a>
+        )}
     </div>
   );
 };
