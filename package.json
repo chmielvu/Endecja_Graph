@@ -13,7 +13,9 @@
     "react-dom": "^19.2.0",
     "@google/genai": "^1.29.0",
     "vis-network": "^10.0.2",
-    "vis-data": "^8.0.3"
+    "vis-data": "^8.0.3",
+    "zustand": "^4.5.4",
+    "vis-timeline": "^8.3.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

@@ -9,6 +9,8 @@ export interface Node {
   level?: number;
   title?: string; // For vis.js tooltip
   link?: string;
+  start?: string; // For vis-timeline
+  end?: string;   // For vis-timeline
 }
 
 export interface Edge {
@@ -17,7 +19,6 @@ export interface Edge {
   to: string;
   label: string;
   color?: { color: string };
-  // FIX: Added optional 'dashes' property to support dashed lines for edges.
   dashes?: boolean;
 }
 

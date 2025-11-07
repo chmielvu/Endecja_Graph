@@ -1,13 +1,12 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { runChat } from '../services/geminiService';
-import { ChatMessage, ChatMode, Node } from '../types';
+import { ChatMessage, ChatMode } from '../types';
+import { useGraphStore } from '../services/useGraphStore';
 
-interface AiTutorProps {
-  selectedNode: Node | null;
-}
+const AiTutor: React.FC = () => {
+  const { allNodes, allEdges, getSelectedNode } = useGraphStore();
+  const selectedNode = getSelectedNode();
 
-const AiTutor: React.FC<AiTutorProps> = ({ selectedNode }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -28,17 +27,14 @@ const AiTutor: React.FC<AiTutorProps> = ({ selectedNode }) => {
     setInput('');
     setIsLoading(true);
 
-    let context = "General knowledge about Polish history.";
-    if(selectedNode) {
-      context = `The user has selected the following node from the knowledge graph:
-      - Name: ${selectedNode.label}
-      - Type: ${selectedNode.group}
-      - Description: ${selectedNode.description}
-      Please use this as the primary context for your answer.`
-    }
+    const graphContext = {
+      nodes: allNodes,
+      edges: allEdges,
+      selectedNode,
+    };
 
     try {
-      const modelResponse = await runChat(messages, input, mode, context);
+      const modelResponse = await runChat(messages, input, mode, graphContext);
       setMessages(prev => [...prev, modelResponse]);
     } catch (error) {
       console.error(error);
@@ -48,7 +44,6 @@ const AiTutor: React.FC<AiTutorProps> = ({ selectedNode }) => {
     }
   };
 
-  // FIX: Replaced JSX.Element with React.ReactElement to resolve "Cannot find namespace 'JSX'" error.
   const ModeButton: React.FC<{ value: ChatMode, label: string, icon: React.ReactElement }> = ({ value, label, icon }) => (
     <button
       onClick={() => setMode(value)}

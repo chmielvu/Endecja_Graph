@@ -1,12 +1,5 @@
 import React from 'react';
-import { LayoutType } from '../types';
-
-interface GraphControlsProps {
-    layout: LayoutType;
-    onLayoutChange: (layout: LayoutType) => void;
-    activeFilter: string;
-    onFilterChange: (filter: string) => void;
-}
+import { useGraphStore } from '../services/useGraphStore';
 
 const FilterButton: React.FC<{ filter: string, activeFilter: string, onClick: (filter: string) => void, children: React.ReactNode }> = ({ filter, activeFilter, onClick, children }) => {
     const isActive = filter === activeFilter;
@@ -20,10 +13,11 @@ const FilterButton: React.FC<{ filter: string, activeFilter: string, onClick: (f
     );
 };
 
+const GraphControls: React.FC = () => {
+    const { layout, setLayout, activeFilter, setFilter } = useGraphStore();
 
-const GraphControls: React.FC<GraphControlsProps> = ({ layout, onLayoutChange, activeFilter, onFilterChange }) => {
     const toggleLayout = () => {
-        onLayoutChange(layout === 'physics' ? 'hierarchical' : 'physics');
+        setLayout(layout === 'physics' ? 'hierarchical' : 'physics');
     };
 
     const filters = [
@@ -59,7 +53,7 @@ const GraphControls: React.FC<GraphControlsProps> = ({ layout, onLayoutChange, a
             <div className="flex flex-wrap gap-2 mt-4 items-center">
                 <span className="text-sm font-semibold text-gray-700 self-center mr-2">Filter by Group:</span>
                 {filters.map(f => (
-                    <FilterButton key={f.id} filter={f.id} activeFilter={activeFilter} onClick={onFilterChange}>
+                    <FilterButton key={f.id} filter={f.id} activeFilter={activeFilter} onClick={setFilter}>
                         {f.label}
                     </FilterButton>
                 ))}

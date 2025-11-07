@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { proposeNewGraphData } from '../services/geminiService';
 import { Node, Edge } from '../types';
+import { useGraphStore } from '../services/useGraphStore';
 
-interface AiGraphExpanderProps {
-  onAddData: (newNode: Node, newEdges: Edge[]) => void;
-  allNodesMap: Map<string, Node>;
-}
-
-const AiGraphExpander: React.FC<AiGraphExpanderProps> = ({ onAddData, allNodesMap }) => {
+const AiGraphExpander: React.FC = () => {
+  const { getNodesMap, addNode, addEdges } = useGraphStore();
+  
   const [topic, setTopic] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [proposedData, setProposedData] = useState<string | null>(null);
@@ -17,8 +15,7 @@ const AiGraphExpander: React.FC<AiGraphExpanderProps> = ({ onAddData, allNodesMa
     setIsLoading(true);
     setProposedData(null);
     try {
-      // FIX: Explicitly type existingIds as string[] to resolve TypeScript inference error.
-      const existingIds: string[] = Array.from(allNodesMap.keys());
+      const existingIds: string[] = Array.from(getNodesMap().keys());
       const jsonString = await proposeNewGraphData(topic, existingIds);
       setProposedData(jsonString);
     } catch (e) {
@@ -35,7 +32,10 @@ const AiGraphExpander: React.FC<AiGraphExpanderProps> = ({ onAddData, allNodesMa
       if (data.error) {
         alert(`Error: ${data.error}`);
       } else if (data.newNode && data.newEdges) {
-        onAddData(data.newNode, data.newEdges);
+        // Use Zustand actions to add data
+        addNode(data.newNode as Node);
+        addEdges(data.newEdges as Edge[]);
+        
         setProposedData(null);
         setTopic('');
       } else {
