@@ -8,11 +8,26 @@ interface Proposal {
     newEdges: Edge[];
 }
 
+// Add this helper function
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
+};
+
 const DocumentImporter: React.FC = () => {
     const { getNodesMap, addNode, addEdges } = useGraphStore();
     const [isLoading, setIsLoading] = useState(false);
     const [proposals, setProposals] = useState<Proposal[]>([]);
     const [fileName, setFileName] = useState<string | null>(null);
+
+    // --- NEW STATE ---
+    const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
+    const [imageBase64, setImageBase64] = useState<string | null>(null);
+
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -21,10 +36,13 @@ const DocumentImporter: React.FC = () => {
         setIsLoading(true);
         setProposals([]);
         setFileName(file.name);
+        setSelectedProposal(null); // Clear any previous selection
+        setImageBase64(null);
 
         try {
             const content = await file.text();
             const existingIds: string[] = Array.from(getNodesMap().keys());
+            // Use the service that *doesn't* ask for an image
             const jsonString = await ingestDocument(content, existingIds);
             const data = JSON.parse(jsonString);
             
@@ -44,11 +62,31 @@ const DocumentImporter: React.FC = () => {
         }
     };
 
-    const handleConfirm = (proposal: Proposal, index: number) => {
-        addNode(proposal.newNode);
-        addEdges(proposal.newEdges);
-        // Remove confirmed proposal from the list
-        setProposals(prev => prev.filter((_, i) => i !== index));
+    // --- NEW FUNCTION (Step 1) ---
+    const handleSelectProposal = (proposal: Proposal) => {
+        setSelectedProposal(proposal);
+        setImageBase64(null); // Clear any old image
+    };
+
+    // --- NEW FUNCTION (Step 2) ---
+    const handleAddNodeWithImage = () => {
+        if (!selectedProposal || !imageBase64) {
+            alert("An image is required to add the node.");
+            return;
+        }
+
+        const finalNode = {
+            ...selectedProposal.newNode,
+            image: imageBase64
+        };
+
+        addNode(finalNode);
+        addEdges(selectedProposal.newEdges);
+        setProposals(prev => prev.filter(p => p.newNode.id !== selectedProposal.newNode.id));
+
+        // Reset the state
+        setSelectedProposal(null);
+        setImageBase64(null);
     };
 
     return (
@@ -72,16 +110,57 @@ const DocumentImporter: React.FC = () => {
                 </label>
             </div> 
 
-            {proposals.length > 0 && (
+            {/* --- NEW CONDITIONAL UI --- */}
+
+            {/* 1. If a proposal is selected, show the image upload UI */}
+            {selectedProposal && (
                 <div className="mt-4">
-                    <h4 className="text-sm font-semibold mb-2">AI Proposals (Validate & Confirm):</h4>
+                    <h4 className="text-sm font-semibold">Step 2: Upload Image for:</h4>
+                    <p className="text-lg font-bold text-gray-800 mb-2">{selectedProposal.newNode.label}</p>
+                    
+                    <label className="block text-sm font-medium text-gray-700">
+                      Upload Portrait (Required)
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      onChange={async (e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          const base64String = await fileToBase64(e.target.files[0]);
+                          setImageBase64(base64String);
+                        }
+                      }}
+                    />
+                    <div className="flex gap-2 mt-2">
+                        <button 
+                          onClick={handleAddNodeWithImage} 
+                          disabled={!imageBase64}
+                          className="flex-1 px-3 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400">
+                            Confirm & Add to Graph
+                        </button>
+                        <button 
+                          onClick={() => { setSelectedProposal(null); setImageBase64(null); }} 
+                          className="flex-1 px-3 py-2 text-sm bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* 2. If no proposal is selected, show the list of proposals */}
+            {proposals.length > 0 && !selectedProposal && (
+                <div className="mt-4">
+                    <h4 className="text-sm font-semibold mb-2">Step 1: Select a Proposal to Add:</h4>
                     <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
                         {proposals.map((p, i) => (
                             <div key={i} className="p-2 bg-gray-100 rounded">
                                 <p className="text-sm font-bold">{p.newNode.label}</p>
                                 <p className="text-xs text-gray-600 mb-2">{p.newNode.description}</p>
-                                <button onClick={() => handleConfirm(p, i)} className="w-full px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700">
-                                    Add to Graph
+                                <button 
+                                  onClick={() => handleSelectProposal(p)} 
+                                  className="w-full px-3 py-1 text-xs bg-indigo-700 text-white rounded hover:bg-indigo-800">
+                                    Add Image...
                                 </button>
                             </div>
                         ))}

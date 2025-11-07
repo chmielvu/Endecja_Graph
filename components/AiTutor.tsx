@@ -47,7 +47,7 @@ const AiTutor: React.FC = () => {
   const ModeButton: React.FC<{ value: ChatMode, label: string, icon: React.ReactElement }> = ({ value, label, icon }) => (
     <button
       onClick={() => setMode(value)}
-      className={`flex-1 flex items-center justify-center p-2 text-xs rounded-md transition-colors ${mode === value ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+      className={`flex-1 flex items-center justify-center p-2 text-xs rounded-md transition-colors ${mode === value ? 'bg-indigo-700 text-white' : 'bg-stone-200 text-gray-700 hover:bg-stone-300'}`}
       title={label}
     >
       {icon}
@@ -69,7 +69,7 @@ const AiTutor: React.FC = () => {
         <div className="space-y-4">
           {messages.map((msg, index) => (
             <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`p-3 rounded-lg max-w-sm md:max-w-md ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
+              <div className={`p-3 rounded-lg max-w-sm md:max-w-md ${msg.role === 'user' ? 'bg-indigo-600 text-white' : 'bg-stone-200 text-gray-800'}`}>
                 <p className="text-sm" dangerouslySetInnerHTML={{ __html: msg.text.replace(/\n/g, '<br />') }} />
                 {msg.sources && (
                   <div className="mt-3 pt-2 border-t border-gray-300">
@@ -113,7 +113,7 @@ const AiTutor: React.FC = () => {
             className="flex-grow px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={isLoading}
           />
-          <button onClick={handleSend} disabled={isLoading} className="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 disabled:bg-blue-300">
+          <button onClick={handleSend} disabled={isLoading} className="px-4 py-2 bg-indigo-700 text-white rounded-r-md hover:bg-indigo-800 disabled:bg-indigo-300">
             Send
           </button>
         </div>

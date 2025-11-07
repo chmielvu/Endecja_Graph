@@ -9,21 +9,21 @@ const Graph: React.FC = () => {
   
   const containerRef = useRef<HTMLDivElement>(null);
   const networkRef = useRef<Network | null>(null);
-  // These are the master datasets
+
+  // SOTA: Use Refs for master DataSets and high-performance DataViews
   const nodesRef = useRef(new DataSet<Node>());
   const edgesRef = useRef(new DataSet<Edge>());
-  // This is the new high-performance view
-  const dataViewRef = useRef<GraphDataView | null>(null);
+  const nodeViewRef = useRef<GraphDataView | null>(null);
+  const edgeViewRef = useRef<GraphDataView | null>(null);
 
-
-  // Base options shared by both layouts
+  // SOTA: This is the "Endecja Vibe" baseOptions, which we are keeping
   const baseOptions = {
       nodes: {
           shape: 'circularImage',
           borderWidth: 3,
           borderWidthSelected: 8, // Thicker border for clear selection
           font: { size: 16, face: 'Merriweather', color: '#1f2937' }, // Serif font
-          brokenImage: "[https://i.ibb.co/g7pMXX5/image-missing.png](https://i.ibb.co/g7pMXX5/image-missing.png)",
+          brokenImage: "https://i.ibb.co/g7pMXX5/image-missing.png", // Corrected link
           shadow: {
             enabled: true,
             color: 'rgba(87, 56, 24, 0.25)', // Sepia shadow
@@ -62,28 +62,17 @@ const Graph: React.FC = () => {
           navigationButtons: true,
           hoverConnectedEdges: true,
       },
-      // --- NEW "ENDECJA VIBE" GROUP COLORS ---
       groups: {
-          // Deep, academic blue for thinkers
           ideologue: { color: { border: '#3730a3', background: '#e0e7ff', highlight: { border: '#3730a3', background: '#c7d2fe' }, hover: { border: '#3730a3', background: '#c7d2fe' } }, size: 40 },
           thinker: { color: { border: '#3730a3', background: '#e0e7ff', highlight: { border: '#3730a3', background: '#c7d2fe' }, hover: { border: '#3730a3', background: '#c7d2fe' } }, size: 30 },
-          
-          // Modern ND: Muted, cool gray
           modern_nd: { color: { border: '#4b5563', background: '#e5e7eb', highlight: { border: '#1f2937', background: '#d1d5db' }, hover: { border: '#1f2937', background: '#d1d5db' } }, size: 30 },
-          
-          // Allies/Rivals: Deep forest green
           leader: { color: { border: '#14532d', background: '#dcfce7', highlight: { border: '#14532d', background: '#bbf7d0' }, hover: { border: '#14532d', background: '#bbf7d0' } }, size: 35 },
-          
-          // Clergy: Rich, ecclesiastical gold
           clergy: { color: { border: '#b45309', background: '#fef9c3', highlight: { border: '#b45309', background: '#fef08a' }, hover: { border: '#b45309', background: '#fef08a' } }, size: 30 },
-          
-          // Organizations: Deep "Claret" Red
           organization: { 
               shape: 'icon',
               icon: { face: '"Font Awesome 6 Free"', code: '\uf132', size: 40, color: '#9f1239' }, // rose-800
               color: { border: '#9f1239', background: '#ffe4e6' }
           },
-          // Events/Publications: Dark, archival orange
           event: {
               shape: 'icon',
               icon: { face: '"Font Awesome 6 Free"', code: '\uf133', size: 35, color: '#9a3412' }, // orange-800
@@ -94,13 +83,11 @@ const Graph: React.FC = () => {
               icon: { face: '"Font Awesome 6 Free"', code: '\uf1ea', size: 35, color: '#9a3412' }, // orange-800
               color: { border: '#9a3412', background: '#fff7ed' }
           },
-          // Cities: Neutral stone
           city: {
               shape: 'icon',
               icon: { face: '"Font Awesome 6 Free"', code: '\uf19c', size: 30, color: '#57534e' }, // stone-600
               color: { border: '#57534e', background: '#e7e5e4' }
           },
-          // Antagonists: Stark charcoal
           antagonist: {
               shape: 'icon',
               icon: { face: '"Font Awesome 6 Free"', code: '\uf057', size: 35, color: '#171717' }, // neutral-900
@@ -114,7 +101,7 @@ const Graph: React.FC = () => {
       physics: {
           enabled: true,
           solver: 'barnesHut',
-          barnesHut: { gravitationalConstant: -15000, centralGravity: 0.05, springLength: 200, avoidOverlap: 0.8 },
+          barnesHut: { gravitationalConstant: -15000, centralGravity: 0.05, springLength: 200, avoidOverlap: 1 }, // Set avoidOverlap to 1
           stabilization: { iterations: 1500, fit: true },
       },
       layout: { hierarchical: false }
@@ -140,10 +127,10 @@ const Graph: React.FC = () => {
  
        const nodesToUpdate = Object.values(allNodes).map((node: any) => {
          const isConnected = connectedNodes.includes(node.id);
-         node.color = { ...baseOptions.groups[node.group]?.color };
+         node.color = { ...baseOptions.groups[node.group]?.color }; // Use original group color
          if (!isConnected) {
-           node.color.background = '#f9fafb';
-           node.color.border = '#e5e7eb';
+           node.color.background = '#fbf9f4'; // Parchment fade
+           node.color.border = '#e7e5e4'; // Stone border fade
          }
          return node;
        });
@@ -164,20 +151,29 @@ const Graph: React.FC = () => {
      nodesRef.current.update(nodesToUpdate);
    };
 
-  // Initialize network instance ONCE on mount
+  // SOTA FIX: Initialize network instance ONCE on mount
   useEffect(() => {
     if (containerRef.current && !networkRef.current) {
-        // Create the DataView for high-performance filtering
-        dataViewRef.current = new DataView(nodesRef.current, {
+        
+        // SOTA: Create two DataViews, one for nodes and one for edges
+        nodeViewRef.current = new DataView(nodesRef.current, {
           filter: (node) => {
-            // Get the *current* filter from the store
             const filter = useGraphStore.getState().activeFilter;
             return filter === 'all' || node.group === filter;
           }
         });
 
-        // Pass the DataView (not the DataSet) to the Network
-        const data = { nodes: dataViewRef.current, edges: edgesRef.current };
+        edgeViewRef.current = new DataView(edgesRef.current, {
+          filter: (edge) => {
+            const nodeView = nodeViewRef.current;
+            if (!nodeView) return true;
+            // Only show edges where BOTH nodes are visible
+            return nodeView.get(edge.from) && nodeView.get(edge.to);
+          }
+        });
+
+        // Pass the DataViews (not the DataSets) to the Network
+        const data = { nodes: nodeViewRef.current, edges: edgeViewRef.current };
         const initialOptions = layout === 'physics' ? physicsLayoutOptions : hierarchicalLayoutOptions;
         const mergedOptions = { ...baseOptions, ...initialOptions };
 
@@ -198,32 +194,36 @@ const Graph: React.FC = () => {
             networkRef.current = null;
         }
     };
-  }, []);
+  }, []); // Empty dependency array is correct
 
-  // EFFECT 1: This just updates the master list if the store's data changes
+  // SOTA FIX: This effect updates the *master* data when the store changes
   useEffect(() => {
-    nodesRef.current.clear();
-    nodesRef.current.add(allNodes.map(n => ({...n, title: n.description || n.label}))); // Add title for tooltip
+    // Add titles for tooltips
+    const nodesWithTitles = allNodes.map(n => ({...n, title: n.description || n.label}));
     
+    nodesRef.current.clear();
+    nodesRef.current.add(nodesWithTitles);
     edgesRef.current.clear();
     edgesRef.current.add(allEdges);
+    
+    // DataViews will auto-refresh, but we need to trigger the edgeView filter
+    if (edgeViewRef.current) {
+        edgeViewRef.current.refresh();
+    }
   }, [allNodes, allEdges]);
 
-  // EFFECT 2: This just re-runs the filter when activeFilter changes
+  // SOTA FIX: This effect *only* handles filter changes by refreshing the views
   useEffect(() => {
-    if (dataViewRef.current) {
-      dataViewRef.current.refresh(); // This is the high-performance part
+    if (nodeViewRef.current) {
+      nodeViewRef.current.refresh();
     }
-    
-    // We must still manually filter edges
-    const visibleNodeIds = new Set(dataViewRef.current ? dataViewRef.current.getIds() : allNodes.map(n => n.id));
-    const filteredEdges = allEdges.filter(e => visibleNodeIds.has(e.from) && visibleNodeIds.has(e.to));
-    edgesRef.current.clear();
-    edgesRef.current.add(filteredEdges);
-  }, [activeFilter, allEdges]); // allEdges is needed to re-filter edges
+    // We must refresh edgeView *after* nodeView so it can filter correctly
+    if (edgeViewRef.current) {
+      edgeViewRef.current.refresh();
+    }
+  }, [activeFilter]);
 
-
-  // Update layout when prop changes
+  // SOTA FIX: This effect handles layout changes
   useEffect(() => {
     if (networkRef.current) {
       const optionsToApply = layout === 'physics' ? physicsLayoutOptions : hierarchicalLayoutOptions;
